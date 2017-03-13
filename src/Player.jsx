@@ -22,15 +22,17 @@ export default class Player extends Component {
   componentDidMount() {
     if (this.props.active) {
       const { onRotate, onMove } = this.props;
-      const shake = new Shake();
-      shake.start();
-      window.addEventListener("shake", this.onMove, false);
-
-      let lastRotation = {};
+      this.shaker = new Shake({
+        threshold: 5,
+        timeout: 250
+      });
+      this.shaker.start();
+      window.addEventListener("shake", this.onShakeMove, false);
 
       this.moveDebounce = debounce(onMove);
       document.addEventListener("keydown", this.onMove);
 
+      let lastRotation = {};
       this.rotating = setInterval(
         () => {
           if (this.camera) {
@@ -40,11 +42,7 @@ export default class Player extends Component {
               lastRotation.y !== rotation.y ||
               lastRotation.z !== rotation.z
             ) {
-              if (onRotate) {
-                onRotate({ rotation });
-              } else {
-                console.log(rotation);
-              }
+              onRotate({ rotation });
               lastRotation = rotation;
             }
           }
@@ -57,7 +55,8 @@ export default class Player extends Component {
 
   componentWillUnmount() {
     clearInterval(this.rotating);
-    window.removeEventListener("shake", this.onShakeMove);
+    this.shaker.stop();
+    window.removeEventListener("shake", this.onShakeMove, false);
     window.removeEventListener("keydown", this.onMove);
   }
 
