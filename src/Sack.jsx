@@ -43,7 +43,11 @@ export default class Sack extends Component {
               rotation ? [rotation.x, rotation.y, rotation.z] : [0, 0, 0]
             }
           />
-        : <Entity position={position} geometry={{ primitive: "box" }} />;
+        : <Entity position={[0, 2, 0]}><Entity
+            position={position}
+            geometry={{ primitive: "box", width: 0.5, height: 0.5, depth: 0.5 }}
+            material={{ opacity: 0.5 }}
+          /></Entity>;
 
       return (
         <Entity key={key || idx}>
@@ -68,7 +72,7 @@ export default class Sack extends Component {
                   scale={[0.03, 0.03, 0.03]}
                   rotation={[0, -45, 0]}
                   material={{
-                    color: 'brown',
+                    color: "brown"
                   }}
                   obj-model="obj: url(/potato_sack.obj);"
                 />

@@ -243,6 +243,7 @@ class App extends Component {
         </Entity>
         <Entity primitive="a-sky" material={{ color: "black" }} />
         <Entity
+          position={[0, 0, -8]}
           geometry={{
             primitive: "plane",
             width: 10,
