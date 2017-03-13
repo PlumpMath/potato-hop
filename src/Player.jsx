@@ -4,25 +4,42 @@ import { Entity } from "aframe-react";
 import Shake from 'shake.js';
 
 export default class player extends Component {
-  propTypes: {
+  static propTypes = {
     active: React.PropTypes.bool,
     position: React.PropTypes.array,
     rotation: React.PropTypes.array,
     hop: React.PropTypes.func,
-  }
-  getDefaultProps() {
-    return {
+    onRotate: React.PropTypes.func,
+  };
+
+  static defaultProps = {
       active: false,
-    };
-  }
+  };
+
   componentDidMount() {
     if (this.props.active) {
+      const { onRotate } = this.props;
       const shake = new Shake();
       shake.start();
       window.addEventListener('shake', this.hop, false);
+
+      let lastRotation = {};
+
+      this.rotating = setInterval(() => {
+        if (this.camera) {
+          const rotation = this.camera.getAttribute('rotation');
+          lastRotation = rotation;
+          if (lastRotation.x !== rotation.x || lastRotation.y !== rotation.y || lastRotation.z !== rotation.y) {
+            onRotate({rotation});
+          }
+        }
+        // get rotation
+      }, 120);
     }
   }
+
   componentWillUnmount() {
+    clearInterval(this.rotating);
     window.removeEventListener('shake', this.hop);
   }
   hop = () => {
