@@ -242,12 +242,12 @@ class App extends Component {
         <Entity position="0 0 0">
           <Entity primitive="a-box" position="0 0 -2" />
         </Entity>
-        <Entity primitive="a-sky" material={{ color: "green" }} />
+        <Entity primitive="a-sky" material={{ color: "black" }} />
         <Entity
           geometry={{
             primitive: "plane",
             width: 10,
-            height: 10
+            height: 20
           }}
           rotation={[-90, 0, 0]}
           material={{

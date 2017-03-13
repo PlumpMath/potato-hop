@@ -64,6 +64,14 @@ export default class Sack extends Component {
             return (
               <Entity {...{ position: [x, y, style.z], rotation }}>
                 {players}
+                <Entity
+                  scale={[0.03, 0.03, 0.03]}
+                  rotation={[0, -45, 0]}
+                  material={{
+                    color: 'brown',
+                  }}
+                  obj-model="obj: url(/potato_sack.obj);"
+                />
               </Entity>
             );
           }}

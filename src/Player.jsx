@@ -85,7 +85,7 @@ export default class Player extends Component {
     const { active, filled, position, rotation } = this.props;
     const cameraOpts = active ? { "look-controls": "" } : {};
     const person = filled
-      ? <Entity position={[0, 1.6, 0]} {...active ? {} : { rotation }}>
+      ? <Entity position={[0, 2, 0]} {...active ? {} : { rotation }}>
           <Entity
             ref={el => {
               const node = ReactDOM.findDOMNode(el);
@@ -102,8 +102,8 @@ export default class Player extends Component {
             <Entity
               geometry={{
                 primitive: "box",
-                width: 0.5,
-                height: 0.8
+                width: 0.25,
+                height: 0.4
               }}
             />
           </Entity>
@@ -112,19 +112,6 @@ export default class Player extends Component {
     return (
       <Entity {...{ position }}>
         {person}
-        <Entity
-          geometry={{
-            primitive: "box"
-          }}
-        >
-          <a-animation
-            attribute="position"
-            direction="alternate"
-            from="0 0 0"
-            to="0 0.3 0"
-            repeat="0"
-          />
-        </Entity>
       </Entity>
     );
   }
