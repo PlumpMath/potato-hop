@@ -207,6 +207,7 @@ class App extends Component {
     const sackSize = 2 + spacing;
     const { currentPlayer, players, sacks } = this.state;
     const teams = sacks.map(([player1key, player2key], idx) => {
+      // move sack in one direction
       const { z: sackZ } = this.state.sackPositions[idx] || { z: 0 };
       const position = [(-1) * sackSize * idx, 0, sackZ];
 
