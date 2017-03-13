@@ -1,7 +1,8 @@
-import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
-import { Entity } from 'aframe-react';
-import Shake from 'shake.js';
+import React, { Component } from "react";
+import ReactDOM from "react-dom";
+import { Entity } from "aframe-react";
+import Shake from "shake.js";
+import debounce from "./debounce";
 
 export default class Player extends Component {
   static propTypes = {
@@ -10,25 +11,30 @@ export default class Player extends Component {
     rotation: React.PropTypes.array,
     hop: React.PropTypes.func,
     onRotate: React.PropTypes.func,
+    onMove: React.PropTypes.func,
+    id: React.PropTypes.string
   };
 
   static defaultProps = {
-    active: false,
+    active: false
   };
 
   componentDidMount() {
     if (this.props.active) {
-      const { onRotate } = this.props;
+      const { onRotate, onMove } = this.props;
       const shake = new Shake();
       shake.start();
-      window.addEventListener('shake', this.hop, false);
+      window.addEventListener("shake", this.onMove, false);
 
       let lastRotation = {};
+
+      this.moveDebounce = debounce(onMove);
+      document.addEventListener("keydown", this.onMove);
 
       this.rotating = setInterval(
         () => {
           if (this.camera) {
-            const rotation = this.camera.getAttribute('rotation');
+            const rotation = this.camera.getAttribute("rotation");
             if (
               lastRotation.x !== rotation.x ||
               lastRotation.y !== rotation.y ||
@@ -42,28 +48,43 @@ export default class Player extends Component {
               lastRotation = rotation;
             }
           }
-
           // get rotation
         },
-        120,
+        120
       );
     }
   }
 
   componentWillUnmount() {
     clearInterval(this.rotating);
-    window.removeEventListener('shake', this.hop);
+    window.removeEventListener("shake", this.onShakeMove);
+    window.removeEventListener("keydown", this.onMove);
   }
-  hop = () => {
-    const { hop } = this.props;
-    if (this.camera) {
-      const rotation = this.camera.getAttribute('rotation');
-      hop(rotation);
+
+  // hop = () => {
+  //   const { hop } = this.props;
+  //   if (this.camera) {
+  //     const rotation = this.camera.getAttribute('rotation');
+  //     hop(rotation);
+  //   }
+  // };
+
+  onShakeMove = () => {
+    const { id } = this.props;
+    this.moveDebounce(id);
+  };
+
+  onMove = ev => {
+    const { id } = this.props;
+    const keyCode = ev.keyCode;
+    if (keyCode === 87) {
+      this.moveDebounce(id);
     }
   };
+
   render() {
     const { active, filled, position, rotation } = this.props;
-    const cameraOpts = active ? { 'look-controls': '' } : {};
+    const cameraOpts = active ? { "look-controls": "" } : {};
     const person = filled
       ? <Entity position={[0, 1.6, 0]} {...active ? {} : { rotation }}>
           <Entity
@@ -75,15 +96,15 @@ export default class Player extends Component {
             }}
             position={[0, 0.5, 0]}
             camera={{
-              active,
+              active
             }}
             {...cameraOpts}
           >
             <Entity
               geometry={{
-                primitive: 'box',
+                primitive: "box",
                 width: 0.5,
-                height: 0.8,
+                height: 0.8
               }}
             />
           </Entity>
@@ -94,7 +115,7 @@ export default class Player extends Component {
         {person}
         <Entity
           geometry={{
-            primitive: 'box',
+            primitive: "box"
           }}
         >
           <a-animation

@@ -14,12 +14,15 @@
     "firebase": "^3.7.1",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
-    "shake.js": "^1.2.2"
+    "react-motion": "^0.4.7",
+    "shake.js": "^1.2.2",
+    "surge": "^0.18.0"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "surge": "yarn run build && surge --domain https://phop.surge.sh --project ./build"
   }
 }
