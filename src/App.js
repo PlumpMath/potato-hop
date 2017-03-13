@@ -3,7 +3,6 @@ import "./App.css";
 import { Scene, Entity } from "aframe-react";
 import firebase from "firebase";
 
-// import PlayerManager from './PlayerManager';
 import Player from "./Player";
 import Sack from "./Sack";
 
