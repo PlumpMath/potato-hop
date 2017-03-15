@@ -95,17 +95,33 @@ export default class Player extends Component {
             }}
             position={[0, 0.5, 0]}
             camera={{
-              active
+              active,
             }}
             {...cameraOpts}
           >
             <Entity
               geometry={{
-                primitive: "box",
+                primitive: 'box',
                 width: 0.25,
-                height: 0.4
+                height: 0.4,
               }}
-            />
+            >
+              {active
+                ? null
+                : <Entity position={[0, 0, -0.5]}>
+                    <Entity
+                      geometry={{ primitive: 'sphere', radius: 0.05 }}
+                      material={{ color: 'white' }}
+                      position={[0.08, 0, 0]}
+                    />
+                    <Entity
+                      geometry={{ primitive: 'sphere', radius: 0.05 }}
+                      material={{ color: 'white' }}
+                      position={[-0.08, 0, 0]}
+                    />
+                  </Entity>}
+
+            </Entity>
           </Entity>
         </Entity>
       : null;
