@@ -1,17 +1,19 @@
-import React, { Component } from "react";
-import "./App.css";
-import { Scene, Entity } from "aframe-react";
-import firebase from "firebase";
+import React, { Component } from 'react';
+import './App.css';
+import { Scene, Entity } from 'aframe-react';
+import firebase from 'firebase';
 
-import Player from "./Player";
-import Sack from "./Sack";
+import Player from './Player';
+import Sack from './Sack';
+
+import Lightning from './Lightning';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBkEkDfcfDIL2MBYVkTs5CiAW_RHYeZtu0",
-  authDomain: "potato-hop.firebaseapp.com",
-  databaseURL: "https://potato-hop.firebaseio.com",
-  storageBucket: "potato-hop.appspot.com",
-  messagingSenderId: "777440646254"
+  apiKey: 'AIzaSyBkEkDfcfDIL2MBYVkTs5CiAW_RHYeZtu0',
+  authDomain: 'potato-hop.firebaseapp.com',
+  databaseURL: 'https://potato-hop.firebaseio.com',
+  storageBucket: 'potato-hop.appspot.com',
+  messagingSenderId: '777440646254',
 };
 const app = firebase.initializeApp(firebaseConfig);
 
@@ -22,29 +24,29 @@ class App extends Component {
     players: {},
     sacks: [[]],
     sackPositions: [],
-    manager: null
+    manager: null,
   };
 
   componentDidMount() {
     // TODO: store player id in a cookie
     const db = app.database();
-    const playersRef = db.ref("players");
-    const manager = db.ref("manager");
+    const playersRef = db.ref('players');
+    const manager = db.ref('manager');
 
-    playersRef.on("value", snapshot => {
+    playersRef.on('value', snapshot => {
       const players = snapshot.val();
       this.setState({
-        players
+        players,
       });
     });
     this.playerRef = playersRef.push({
       position: { x: 0, y: 0, z: 0 },
-      rotation: { x: 0, y: 0, z: 0 }
+      rotation: { x: 0, y: 0, z: 0 },
     });
     this.playerRef.onDisconnect().remove();
     this.playerMoveRef = db.ref(`playerMoves/${this.playerRef.key}`);
 
-    manager.once("value", snapshot => {
+    manager.once('value', snapshot => {
       const managerKey = snapshot.val();
       if (!managerKey) {
         manager.set(this.playerRef.key);
@@ -55,15 +57,15 @@ class App extends Component {
         this.setState({ manager: managerKey });
 
         // only clients need to sync this, manager holds the truth
-        db.ref("sacks").on("value", snapshot => {
+        db.ref('sacks').on('value', snapshot => {
           const sacks = snapshot.val();
           this.setState({ sacks });
         });
 
-        db.ref("sackPositions").on("value", snapshot => {
+        db.ref('sackPositions').on('value', snapshot => {
           const sackPositions = snapshot.val();
           this.setState({
-            sackPositions
+            sackPositions,
           });
         });
       }
@@ -71,15 +73,15 @@ class App extends Component {
 
     // create a new player
     this.setState({
-      currentPlayer: this.playerRef.key
+      currentPlayer: this.playerRef.key,
     });
   }
 
   actAsManager = db => {
     // assign player some sacks
 
-    const sacksRef = db.ref("sacks");
-    const sackPosRef = db.ref("sackPositions");
+    const sacksRef = db.ref('sacks');
+    const sackPosRef = db.ref('sackPositions');
     sacksRef.onDisconnect().remove();
     sackPosRef.onDisconnect().remove();
 
@@ -91,14 +93,14 @@ class App extends Component {
     let playerAssignments = [[]];
 
     // NOTE: probably tons of race conditions here
-    const playersRef = db.ref("players");
+    const playersRef = db.ref('players');
 
-    playersRef.on("child_removed", snapshot => {
+    playersRef.on('child_removed', snapshot => {
       const { sack } = snapshot.val();
       // removeo from sacks
       if (sack) {
-        sacksRef.child(sack.join("/")).remove();
-        sacksRef.once("value", snapshot => {
+        sacksRef.child(sack.join('/')).remove();
+        sacksRef.once('value', snapshot => {
           playerAssignments = snapshot.val() || [[]];
         });
       }
@@ -108,7 +110,7 @@ class App extends Component {
       const { sackPositions } = this.state;
       const position = { x: 0, y: 0, z: 0 };
       this.setState({
-        sackPositions: [...sackPositions, position]
+        sackPositions: [...sackPositions, position],
       });
       sackPosRef.child(id).set(position);
     };
@@ -116,10 +118,9 @@ class App extends Component {
     // add initial sack position
     addSack(0);
 
-    playersRef.on("child_added", snapshot => {
+    playersRef.on('child_added', snapshot => {
       const key = snapshot.key;
       const player = snapshot.val();
-      console.log("player added", player);
       const playerRef = db.ref(`players/${key}`);
       if (!player.sack) {
         const count = playerAssignments.length;
@@ -129,7 +130,7 @@ class App extends Component {
             if (sack.length < 2) {
               sacks[idx] = [...sack, key];
               playerRef.update({
-                sack: [idx, sack.length]
+                sack: [idx, sack.length],
               });
               return sacks;
             }
@@ -137,7 +138,7 @@ class App extends Component {
             // if there are no more sacks
             if (idx === count - 1) {
               playerRef.update({
-                sack: [count, 0]
+                sack: [count, 0],
               });
 
               // push initial sack position
@@ -149,7 +150,7 @@ class App extends Component {
             // if the sack is full
             return sacks;
           },
-          playerAssignments
+          playerAssignments,
         );
         sacksRef.set(playerAssignments);
         this.setState({ sacks: playerAssignments });
@@ -158,8 +159,8 @@ class App extends Component {
     // do something to start game
 
     // handle movement
-    const playerMovesRef = db.ref("playerMoves");
-    playerMovesRef.on("value", snapshot => {
+    const playerMovesRef = db.ref('playerMoves');
+    playerMovesRef.on('value', snapshot => {
       const { sacks } = this.state;
       const moves = snapshot.val();
       sacks.forEach((sack, sackId) => {
@@ -170,7 +171,7 @@ class App extends Component {
             const position = this.state.sackPositions[sackId];
             const newPosition = {
               ...position,
-              z: position.z - 1
+              z: position.z - 1,
             };
             // update ref to false
             db.ref(`playerMoves/${player1}`).set(false);
@@ -179,7 +180,7 @@ class App extends Component {
             let newPositions = [...this.state.sackPositions];
             newPositions[sackId] = newPosition;
             this.setState({
-              sackPositions: newPositions
+              sackPositions: newPositions,
             });
           }
         }
@@ -190,7 +191,7 @@ class App extends Component {
 
   playerRotate = ({ rotation }) => {
     if (this.playerRef) {
-      this.playerRef.child("rotation").set(rotation);
+      this.playerRef.child('rotation').set(rotation);
     }
   };
 
@@ -214,14 +215,14 @@ class App extends Component {
         ? {
             ...players[player1key],
             key: player1key,
-            active: currentPlayer === player1key
+            active: currentPlayer === player1key,
           }
         : {};
       const player2 = players[player2key]
         ? {
             ...players[player2key],
             key: player2key,
-            active: currentPlayer === player2key
+            active: currentPlayer === player2key,
           }
         : {};
       return (
@@ -235,25 +236,59 @@ class App extends Component {
         />
       );
     });
+    // <Lightning {...props} position={[0, 10, 0]} />
     return (
       <Scene>
+
+        <a-assets>
+          <img id="sky" src="sky.jpg" />
+        </a-assets>
         {teams}
-        <Entity position="0 0 0">
-          <Entity primitive="a-box" position="0 0 -2" />
+        <Entity position="-5 0 -20">
+          <Entity
+            primitive="a-box"
+            geometry={{
+              width: 100,
+              height: 0.5,
+              depth: 0.1,
+            }}
+            material={{
+              color: 'yellow',
+              shader: 'flat',
+            }}
+            position="0 1 0"
+          />
         </Entity>
-        <Entity primitive="a-sky" material={{ color: "black" }} />
+        <Entity
+          geometry={{
+            primitive: 'sphere',
+            radius: 30,
+            phiLength: 360,
+            phiStart: 0,
+            thetaLength: 90,
+          }}
+          material={{ shader: 'flat', side: 'back', src: '#sky', width: 2048 }}
+        />
         <Entity
           position={[0, 0, -8]}
           geometry={{
-            primitive: "plane",
-            width: 10,
-            height: 20
+            primitive: 'plane',
+            width: 40,
+            height: 40,
           }}
           rotation={[-90, 0, 0]}
           material={{
-            color: "#cccccc"
+            color: '#cccccc',
           }}
         />
+      <Entity primitive="a-box" position={[0, 0, -1]} />
+      <Entity primitive="a-box" position={[0, 0, -5]} />
+      <Entity primitive="a-box" position={[0, 0, -10]} />
+      <Entity primitive="a-box" position={[0, 0, -15]} />
+      <Entity primitive="a-box" position={[-10, 0, -1]} />
+      <Entity primitive="a-box" position={[-10, 0, -5]} />
+      <Entity primitive="a-box" position={[-10, 0, -10]} />
+      <Entity primitive="a-box" position={[-10, 0, -15]} />
       </Scene>
     );
   }
